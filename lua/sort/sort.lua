@@ -331,13 +331,8 @@ end
 --- @param arguments string
 M.line_sort = function(bang, arguments)
   local selection = interface.get_visual_selection()
-  local options = utils.parse_arguments(bang, arguments)
-
-  -- Apply config defaults if not explicitly set by arguments
-  local user_config = config.get_user_config()
-  options.ignore_case = options.ignore_case or user_config.ignore_case
-  options.ignore_negative = options.ignore_negative
-    or user_config.ignore_negative
+  local options =
+    utils.parse_arguments(bang, arguments, config.get_user_config())
 
   local success, lines = pcall(
     vim.api.nvim_buf_get_lines,

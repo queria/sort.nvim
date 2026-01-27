@@ -39,13 +39,8 @@ M.sort = function(bang, arguments)
   if is_multiple_lines_selected then
     sort.line_sort(bang, arguments)
   else
-    local options = utils.parse_arguments(bang, arguments)
-
-    -- Apply config defaults if not explicitly set by arguments
-    local user_config = config.get_user_config()
-    options.ignore_case = options.ignore_case or user_config.ignore_case
-    options.ignore_negative = options.ignore_negative
-      or user_config.ignore_negative
+    local options =
+      utils.parse_arguments(bang, arguments, config.get_user_config())
 
     local text = interface.get_text_between_columns(selection)
     local sorted_text = sort.delimiter_sort(text, options)

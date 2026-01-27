@@ -53,14 +53,34 @@ end
 --- Parse options provided via bang and/or arguments.
 --- @param bang string
 --- @param arguments string
+--- @param defaults Config
 --- @return SortOptions options
-M.parse_arguments = function(bang, arguments)
+M.parse_arguments = function(bang, arguments, defaults)
   local delimiter_pattern = '[st%p]'
   local numerical_pattern = '[bnox]'
   local options = {}
 
   options.delimiter = string.match(arguments, delimiter_pattern)
+    or defaults.delimiters
 
+  options.ignore_case = string.match(arguments, 'i') ~= nil
+  options.ignore_negative = string.match(arguments, 'g') ~= nil
+  options.unique = string.match(arguments, 'u') ~= nil
+  options.natural = string.match(arguments, 'z') ~= nil
+
+  -- TODO: swap with upper part (if arguments: use_args; elif can_use_defaults: use_defs; fi)
+  if true and not arguments then -- TODO: 'true' placeholder to be based on config option
+    options.ignore_case = defaults.ignore_case
+    options.ignore_negative = defaults.ignore_negative
+    options.natural = defaults.natural_sort
+    options.unique = defaults.unique
+  end
+  -- alternatively for toggling-args:
+  --   if can_use_defaults: for k,v in opts: opts[k] = if v then not defs[k] else defs[k] end
+
+  -- reverse is always based only on presence of bang
+  options.reverse = bang == '!'
+  -- numerical is only arguments based, not present in config
   local numerical = string.match(arguments, numerical_pattern)
   if numerical == 'b' then
     options.numerical = 2
@@ -73,12 +93,6 @@ M.parse_arguments = function(bang, arguments)
   else
     options.numerical = false
   end
-
-  options.ignore_case = string.match(arguments, 'i') ~= nil
-  options.ignore_negative = string.match(arguments, 'g') ~= nil
-  options.reverse = bang == '!'
-  options.unique = string.match(arguments, 'u') ~= nil
-  options.natural = string.match(arguments, 'z') ~= nil
 
   return options
 end
